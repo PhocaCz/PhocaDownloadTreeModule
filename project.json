@@ -1,0 +1,18 @@
+{
+	"author": "Jan Pavelka (www.phoca.cz)",
+	"authorUrl": "https://www.phoca.cz",
+	"copyright": "Jan Pavelka",
+	"license": "GNU/GPL",
+	"projectName": "PhocaDownloadTreeModule",
+	"extensionName": "Phoca Download Tree Module",
+	"projectInitials" : "PD",				  
+	"description": "Phoca Download Tree Module is a Joomla! module which displays category tree of Phoca Download categories.",
+	"projectUrl": "https://www.phoca.cz/phocadownload-tree",
+	"projectDocumentationUrl": "https://www.phoca.cz/documentation/category/57-phoca-download-tree-module",
+	"projectMainComponent": "Phoca Download",
+	"projectMainComponentInfoUrl": "https://www.phoca.cz/project/phocadownload-joomla-download",
+	"projectDemo" : {
+		"Demo": "https://www.phoca.cz/download"
+	},
+	"projectColor": "#339933"
+}

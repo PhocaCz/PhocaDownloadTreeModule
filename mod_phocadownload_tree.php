@@ -8,42 +8,47 @@
  * @copyright Copyright (C) Jan Pavelka www.phoca.cz
  * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL
  * @based on javascript: dTree 2.05 www.destroydrop.com/javascript/tree/
- * @copyright (c) 2002-2003 Geir Landr�
+ * @copyright (c) 2002-2003 Geir Landrö
  */
 defined('_JEXEC') or die('Restricted access');// no direct access
-if(!defined('DS')) define('DS', DIRECTORY_SEPARATOR);
+
+
+// Include Phoca Download
 if (!JComponentHelper::isEnabled('com_phocadownload', true)) {
-	return JError::raiseError(JText::_('MOD_PHOCADOWNLOAD_TREE_PHOCA_DOWNLOAD_ERROR'), JText::_('MOD_PHOCADOWNLOAD_TREE_PHOCA_DOWNLOAD_IS_NOT_INSTALLED_ON_YOUR_SYSTEM'));
+	echo '<div class="alert alert-danger">Phoca Download Error: Phoca Download component is not installed or not published on your system</div>';
+	return;
 }
 
 if (! class_exists('PhocaDownloadLoader')) {
-    require_once( JPATH_ADMINISTRATOR.DS.'components'.DS.'com_phocadownload'.DS.'libraries'.DS.'loader.php');
+    require_once( JPATH_ADMINISTRATOR.'/components/com_phocadownload/libraries/loader.php');
 }
+phocadownloadimport('phocadownload.access.access');
 phocadownloadimport('phocadownload.path.path');
 phocadownloadimport('phocadownload.path.route');
 phocadownloadimport('phocadownload.access.access');
 
-$user 		= &JFactory::getUser();
-$db 		= &JFactory::getDBO();
-$menu 		= &JSite::getMenu();
-$document	= &JFactory::getDocument();
-		
+$user 		= JFactory::getUser();
+$db 		= JFactory::getDBO();
+$app 		= JFactory::getApplication();
+$menu 		= $app->getMenu();
+$document	= JFactory::getDocument();
+
 // Start CSS
-$document->addStyleSheet(JURI::base(true).'/modules/mod_phocadownload_tree/assets/dtree.css');
-$document->addScript( JURI::base(true) . '/modules/mod_phocadownload_tree/assets/dtree.js' );
+$document->addStyleSheet(JURI::base(true).'/media/mod_phocadownload_tree/dtree.css');
+$document->addScript( JURI::base(true) . '/media/mod_phocadownload_tree/dtree.js' );
 
 //Image Path
-$imgPath = JURI::base(true) . '/modules/mod_phocadownload_tree/assets/';
+$imgPath = JURI::base(true) . '/media/mod_phocadownload_tree/';
 //Unique id for more modules
 $treeId = "d".uniqid( "tree_" );
 
 // Current category info
-$id 	= JRequest::getVar( 'id', 0, '', 'int' );
-$option = JRequest::getVar( 'option', 0, '', 'string' );
-$view 	= JRequest::getVar( 'view', 0, '', 'string' );
+$id 	= $app->input->get( 'id', 0, 'int' );
+$option = $app->input->get( 'option', '', 'string' );
+$view 	= $app->input->get( 'view', '', 'string' );
 
 if ( $option == 'com_phocadownload' && $view == 'category' ) {
-	$categoryId = $id; 
+	$categoryId = $id;
 } else {
 	$categoryId = 0;
 }
@@ -69,11 +74,11 @@ $display_access_category = $params->get( 'display_access_category',0 );
 
 // ACCESS - Only registered or not registered
 $hideCatAccessSql = '';
-$user  =& JFactory::getUser();
+$user  = JFactory::getUser();
 $aid = max ($user->getAuthorisedViewLevels());
 if ($display_access_category == 0) {
  $hideCatAccessSql = ' AND cc.access <= '. $aid;
-} 
+}
 
 // All categories -------------------------------------------------------
 $query = 'SELECT cc.title AS text, cc.id AS id, cc.parent_id as parentid, cc.alias as alias, cc.access as access, cc.accessuserid as accessuserid'
@@ -83,16 +88,16 @@ $query = 'SELECT cc.title AS text, cc.id AS id, cc.parent_id as parentid, cc.ali
 		. $hideCatSql
 		. $hideCatAccessSql
 		. ' ORDER BY cc.ordering';
-		
+
 $db->setQuery( $query );
 $categories = $db->loadObjectList();
 
 
 $unSet = 0;
-foreach ($categories as $key => $category) { 
+foreach ($categories as $key => $category) {
 	// USER RIGHT - ACCESS =======================================
 	$rightDisplay	= 1;
-	
+
 	if (isset($categories[$key])) {
 		//$rightDisplay = PhocaGalleryAccess::getUserRight( 'accessuserid', $categories[$key]->accessuserid, $categories[$key]->access, $user->get('aid', 0), $user->get('id', 0), $display_access_category);
 		$rightDisplay = PhocaDownloadAccess::getUserRight( 'accessuserid', $categories[$key]->accessuserid, $categories[$key]->access, $user->getAuthorisedViewLevels(), $user->get('id', 0), $display_access_category);
@@ -106,7 +111,7 @@ foreach ($categories as $key => $category) {
 }
 if ($unSet == 1) {
 	$categories = array_values($categories);
-}	
+}
 
 // Categories tree
 $tree = array();
@@ -115,20 +120,20 @@ $tree = categoryTree( $categories, $tree, 0, $text, $treeId );
 
 
 // Create category tree
-function categoryTree( $data, $tree, $id=0, $text='', $treeId ) {      
-   foreach ( $data as $value ) {   
+function categoryTree( $data, $tree, $id=0, $text='', $treeId ) {
+   foreach ( $data as $value ) {
       if ($value->parentid == $id) {
          $link = JRoute::_(PhocaDownloadRoute::getCategoryRoute($value->id, $value->alias));
          $showText =  $text . ''.$treeId.'.add('.$value->id.','.$value->parentid.',\''.addslashes($value->text).'\',\''.$link.'\');'."\n";
          $tree[$value->id] = $showText;
-         $tree = categoryTree($data, $tree, $value->id, '', $treeId);   
+         $tree = categoryTree($data, $tree, $value->id, '', $treeId);
       }
    }
    return($tree);
 }
 
 // Categories (Head)
-$menu 				= &JSite::getMenu();
+
 $itemsCategories	= $menu->getItems('link', 'index.php?option=com_phocadownload&view=categories');
 $linkCategories 	= '';
 if(isset($itemsCategories[0])) {
@@ -136,7 +141,7 @@ if(isset($itemsCategories[0])) {
 	$linkCategories = JRoute::_('index.php?option=com_phocadownload&view=categories&Itemid='.$itemId);
 }
 
-// Create javascript code	
+// Create javascript code
 $jsTree = '';
 foreach($tree as $key => $value)
 {
@@ -160,6 +165,8 @@ $output.=''."\n";
 $output.='//-->'."\n";
 $output.='</script>';
 $output.='</div></div>';
+
+
 
 require(JModuleHelper::getLayoutPath('mod_phocadownload_tree'));
 ?>
