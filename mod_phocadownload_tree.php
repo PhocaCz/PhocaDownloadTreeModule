@@ -12,6 +12,7 @@
  */
 defined('_JEXEC') or die('Restricted access');// no direct access
 
+use Joomla\CMS\HTML\HTMLHelper;
 
 // Include Phoca Download
 if (!JComponentHelper::isEnabled('com_phocadownload', true)) {
@@ -26,21 +27,22 @@ phocadownloadimport('phocadownload.access.access');
 phocadownloadimport('phocadownload.path.path');
 phocadownloadimport('phocadownload.path.route');
 phocadownloadimport('phocadownload.access.access');
+phocadownloadimport('phocadownload.ordering.ordering');
 
 $user 		= JFactory::getUser();
 $db 		= JFactory::getDBO();
 $app 		= JFactory::getApplication();
 $menu 		= $app->getMenu();
 $document	= JFactory::getDocument();
+$paramsC		= JComponentHelper::getParams('com_phocadownload') ;
+$category_ordering		= $paramsC->get( 'category_ordering', 1 );
+$categoryOrdering 		= PhocaDownloadOrdering::getOrderingText($category_ordering, 2);
+$moduleclass_sfx 			= htmlspecialchars($params->get('moduleclass_sfx'), ENT_COMPAT, 'UTF-8');
+HTMLHelper::_('stylesheet', 'media/mod_phocadownload_tree/jstree/themes/proton/style.min.css', array('version' => 'auto'));
+HTMLHelper::_('script', 'media/mod_phocadownload_tree/jstree/jstree.min.js', array('version' => 'auto'), array('defer' => true));
 
-// Start CSS
-$document->addStyleSheet(JURI::base(true).'/media/mod_phocadownload_tree/dtree.css');
-$document->addScript( JURI::base(true) . '/media/mod_phocadownload_tree/dtree.js' );
 
-//Image Path
-$imgPath = JURI::base(true) . '/media/mod_phocadownload_tree/';
-//Unique id for more modules
-$treeId = "d".uniqid( "tree_" );
+$treeId = uniqid( "phdtjstree" );
 
 // Current category info
 $id 	= $app->input->get( 'id', 0, 'int' );
@@ -81,16 +83,16 @@ if ($display_access_category == 0) {
 }
 
 // All categories -------------------------------------------------------
-$query = 'SELECT cc.title AS text, cc.id AS id, cc.parent_id as parentid, cc.alias as alias, cc.access as access, cc.accessuserid as accessuserid'
+$query = 'SELECT cc.title AS title, cc.id AS id, cc.parent_id as parent_id, cc.alias as alias, cc.access as access, cc.accessuserid as accessuserid'
 		. ' FROM #__phocadownload_categories AS cc'
 		. ' WHERE cc.published = 1'
 		//. ' AND cc.approved = 1'
 		. $hideCatSql
 		. $hideCatAccessSql
-		. ' ORDER BY cc.ordering';
+		. ' ORDER BY '.$categoryOrdering;
 
 $db->setQuery( $query );
-$categories = $db->loadObjectList();
+$categories = $db->loadAssocList();
 
 
 $unSet = 0;
@@ -100,7 +102,7 @@ foreach ($categories as $key => $category) {
 
 	if (isset($categories[$key])) {
 		//$rightDisplay = PhocaGalleryAccess::getUserRight( 'accessuserid', $categories[$key]->accessuserid, $categories[$key]->access, $user->get('aid', 0), $user->get('id', 0), $display_access_category);
-		$rightDisplay = PhocaDownloadAccess::getUserRight( 'accessuserid', $categories[$key]->accessuserid, $categories[$key]->access, $user->getAuthorisedViewLevels(), $user->get('id', 0), $display_access_category);
+		$rightDisplay = PhocaDownloadAccess::getUserRight( 'accessuserid', $categories[$key]['accessuserid'], $categories[$key]['access'], $user->getAuthorisedViewLevels(), $user->get('id', 0), $display_access_category);
 	}
 	//$user->authorisedLevels()
 	if ($rightDisplay == 0) {
@@ -113,60 +115,96 @@ if ($unSet == 1) {
 	$categories = array_values($categories);
 }
 
-// Categories tree
-$tree = array();
-$text = '';
-$tree = categoryTree( $categories, $tree, 0, $text, $treeId );
 
 
-// Create category tree
-function categoryTree( $data, $tree, $id=0, $text='', $treeId ) {
-   foreach ( $data as $value ) {
-      if ($value->parentid == $id) {
-         $link = JRoute::_(PhocaDownloadRoute::getCategoryRoute($value->id, $value->alias));
-         $showText =  $text . ''.$treeId.'.add('.$value->id.','.$value->parentid.',\''.addslashes($value->text).'\',\''.$link.'\');'."\n";
-         $tree[$value->id] = $showText;
-         $tree = categoryTree($data, $tree, $value->id, '', $treeId);
-      }
-   }
-   return($tree);
+$tree = PDTMcategoryTree($categories);
+$tree = PDTMnestedToUl($tree, $categoryId);
+
+
+function PDTMcategoryTree($d, $r = 0, $pk = 'parent_id', $k = 'id', $c = 'children') {
+	$m = array();
+	foreach ($d as $e) {
+		isset($m[$e[$pk]]) ?: $m[$e[$pk]] = array();
+		isset($m[$e[$k]]) ?: $m[$e[$k]] = array();
+		$m[$e[$pk]][] = array_merge($e, array($c => &$m[$e[$k]]));
+	}
+	//return $m[$r][0]; // remove [0] if there could be more than one root nodes
+	if (isset($m[$r])) {
+		return $m[$r];
+	}
+	return 0;
 }
+
+function PDTMnestedToUl($data, $currentCatid = 0) {
+	$result = array();
+
+	if (!empty($data) && count($data) > 0) {
+		$result[] = '<ul>';
+		foreach ($data as $k => $v) {
+			$link 		= JRoute::_(PhocaDownloadRoute::getCategoryRoute($v['id'], $v['alias']));
+
+			// Current Category is selected
+			if ($currentCatid == $v['id']) {
+				$result[] = sprintf(
+					'<li data-jstree=\'{"opened":true,"selected":true}\' >%s%s</li>',
+					'<a href="'.$link.'">' . $v['title']. '</a>',
+					PDTMnestedToUl($v['children'], $currentCatid)
+				);
+			} else {
+				$result[] = sprintf(
+					'<li>%s%s</li>',
+					'<a href="'.$link.'">' . $v['title']. '</a>',
+					PDTMnestedToUl($v['children'], $currentCatid)
+				);
+			}
+		}
+		$result[] = '</ul>';
+	}
+
+	return implode($result);
+}
+
+
+
 
 // Categories (Head)
-
 $itemsCategories	= $menu->getItems('link', 'index.php?option=com_phocadownload&view=categories');
 $linkCategories 	= '';
-if(isset($itemsCategories[0])) {
+$categoriesHeader 	= '';
+if(isset($itemsCategories[0]) && (int)$params->get('display_header', 1) == 1) {
 	$itemId = $itemsCategories[0]->id;
 	$linkCategories = JRoute::_('index.php?option=com_phocadownload&view=categories&Itemid='.$itemId);
+	$categoriesHeader = '<div><a href="'.$linkCategories.'" style="text-decoration:none;color:#333;">'.JText::_( 'MOD_PHOCADOWNLOAD_TREE_CATEGORIES' ).'</a></div>';
 }
 
-// Create javascript code
-$jsTree = '';
-foreach($tree as $key => $value)
-{
-	$jsTree .= $value ;
-}
-
-//  Output
-$output ='<div style="text-align:left;">';
-$output.='<div class="dtree">';
-$output.='<script type="text/javascript">'."\n";
-$output.='<!--'."\n";
-$output.=''."\n";
-$output.=''.$treeId.' = new dTree2568(\''.$treeId.'\', \''.$imgPath.'\');'."\n";
-$output.=''."\n";
-$output.=''.$treeId.'.add(0,-1,\' '.JText::_( 'MOD_PHOCADOWNLOAD_TREE_CATEGORIES' ).'\',\''.$linkCategories.'\');'."\n";
-$output.=$jsTree;
-$output.=''."\n";
-$output.='document.write('.$treeId.');'."\n";
-$output.=''.$treeId.'.openTo('. (int) $categoryId.',\'true\');'. "\n";
-$output.=''."\n";
-$output.='//-->'."\n";
-$output.='</script>';
-$output.='</div></div>';
 
 
+JHtml::_('jquery.framework', false);
+$js	  = array();
+$js[] = ' ';
+$js[] = 'jQuery(function () {';
+$js[] = '   jQuery("#'.$treeId.'").jstree({';
+$js[] = '      "core": {';
+$js[] = '         "themes": {';
+$js[] = '            "name": "proton",';
+$js[] = '            "responsive": true';
+$js[] = '         }';
+$js[] = '      }';
+$js[] = '   }).on("select_node.jstree", function (e, data) {';
+$js[] = '      document.location = data.instance.get_node(data.node, true).children("a").attr("href");';
+$js[] = '   });';
+$js[] = '   jQuery("#'.$treeId.'").on("changed.jstree", function (e, data) {';
+//$js[] = '      con sole.log(data.selected);';
+$js[] = '   });';
+$js[] = '   ';
+$js[] = '   jQuery("button").on("click", function () {';
+$js[] = '      jQuery("#'.$treeId.'").jstree(true).select_node("child_node_1");';
+$js[] = '      jQuery("#'.$treeId.'").jstree("select_node", "child_node_1");';
+$js[] = '      jQuery.jstree.reference("#'.$treeId.'").select_node("child_node_1");';
+$js[] = '   });';
+$js[] = '});';
+$js[] = ' ';
 
+$document->addScriptDeclaration(implode("\n", $js));
 require(JModuleHelper::getLayoutPath('mod_phocadownload_tree'));
 ?>

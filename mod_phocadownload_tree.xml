@@ -2,19 +2,17 @@
 <extension type="module" client="site" method="upgrade" version="3">
 	<name>mod_phocadownload_tree</name>
 	<author>Jan Pavelka (www.phoca.cz)</author>
-	<creationDate>03/02/2019</creationDate>
+	<creationDate>16/04/2020</creationDate>
 	<authorEmail></authorEmail>
 	<authorUrl>https://www.phoca.cz</authorUrl>
 	<copyright>Jan Pavelka</copyright>
 	<license>GNU/GPL</license>
-	<version>3.1.7</version>
+	<version>3.2.0</version>
 	<description>MOD_PHOCADOWNLOAD_TREE_DESCRIPTION</description>
 	<projectName>PhocaDownloadTreeModule</projectName>
 
 	<media destination="mod_phocadownload_tree" folder="media">
-		<folder>img</folder>
-		<filename>dtree.css</filename>
-		<filename>dtree.js</filename>
+		<folder>jstree</folder>
 		<filename>index.html</filename>
 	</media>
 
@@ -37,15 +35,23 @@
 					<option value="1">MOD_PHOCADOWNLOAD_TREE_YES</option>
 					<option value="0">MOD_PHOCADOWNLOAD_TREE_NO</option>
 				</field>
-			</fieldset>
-			
-			<fieldset name="advanced">
-		
-<field name="moduleclass_sfx" type="text" label="COM_MODULES_FIELD_MODULECLASS_SFX_LABEL" description="COM_MODULES_FIELD_MODULECLASS_SFX_DESC"/>
+				
+				<field name="display_header" type="list" default="1" label="MOD_PHOCADOWNLOAD_TREE_DISPLAY_HEADER_LABEL" description="MOD_PHOCADOWNLOAD_TREE_DISPLAY_HEADER_DESC">
+					<option value="1">MOD_PHOCADOWNLOAD_TREE_YES</option>
+					<option value="0">MOD_PHOCADOWNLOAD_TREE_NO</option>
+				</field>
+				
+				<field name="moduleclass_sfx" type="text" label="COM_MODULES_FIELD_MODULECLASS_SFX_LABEL" description="COM_MODULES_FIELD_MODULECLASS_SFX_DESC"/>
 				
 <field name="cache" type="list" default="0" label="COM_MODULES_FIELD_CACHING_LABEL" description="COM_MODULES_FIELD_CACHING_DESC">
 <option value="0">COM_MODULES_FIELD_VALUE_NOCACHING</option>
 </field>
+				
+			</fieldset>
+			
+			<fieldset name="advanced">
+		
+
 
 		
 			</fieldset>

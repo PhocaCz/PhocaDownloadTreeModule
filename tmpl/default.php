@@ -1,8 +1,13 @@
 <?php
 defined('_JEXEC') or die('Restricted access');
-?>
-<div id ="phocadownload-module">
-<center><?php echo $output ?></center>
-</div>
-<div style="clear:both"></div>
 
+echo '<div id="phocadownload-tree-module"class="ph-pd-tree-module'.$moduleclass_sfx .'">';
+if (!empty($tree)) {
+	echo $categoriesHeader;
+	echo '<div id="'.$treeId.'">';
+	
+	echo $tree;
+	echo '</div>';
+}
+echo '</div>';
+?>
