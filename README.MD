@@ -54,7 +54,7 @@ Phoca Download Tree Module is a Joomla! module which displays category tree of P
 
 ## Version
 
-3.2.0
+3.2.1
 
 
 

@@ -179,7 +179,7 @@ if(isset($itemsCategories[0]) && (int)$params->get('display_header', 1) == 1) {
 
 
 
-JHtml::_('jquery.framework', false);
+Joomla\CMS\HTML\HTMLHelper::_('jquery.framework', false);
 $js	  = array();
 $js[] = ' ';
 $js[] = 'jQuery(function () {';
