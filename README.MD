@@ -2,7 +2,7 @@
 
 
 
-![Phoca Download Tree Module](https://github.com/PhocaCz/PhocaDownloadTreeModule/blob/master/mod_phocadownload_tree.png)
+![Phoca Download Tree Module](https://github.com/PhocaCz/PhocaDownloadTreeModule/blob/master/mod_phocadownload_tree.png?raw=true)
 
 # Phoca Download Tree Module
 
@@ -52,9 +52,13 @@ Phoca Download Tree Module is a Joomla! module which displays category tree of P
 
 
 
-## Version
+## Version (Joomla! 3.x)
 
 3.2.1
+
+## Version (Joomla! 4.x)
+
+4.0.0
 
 
 

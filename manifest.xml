@@ -15,7 +15,26 @@
 		<maintainer><![CDATA[ Phoca.cz ]]></maintainer>
 		<maintainerurl>https://www.phoca.cz/</maintainerurl>
 		<section>Updates</section>
-		<targetplatform name="joomla" version="3.9"/>
+		<targetplatform name="joomla" version="3.([89]|10)"/>
+		<client>site</client>
+	</update>
+	<update>
+		<name><![CDATA[ Phoca Download Tree Module ]]></name>
+		<description><![CDATA[ Phoca Download Tree Module is a Joomla! module which displays category tree of Phoca Download categories. ]]></description>
+		<element>mod_phocadownload_tree</element>
+		<type>module</type>
+		<version>4.0.0</version>
+		<infourl title="Phoca Download Tree Module 4.0.0">https://www.phoca.cz/</infourl>
+		<downloads>
+			<downloadurl type="full" format="zip">https://github.com/PhocaCz/PhocaDownloadTreeModule/releases/download/4.0.0/mod_phocadownload_tree_v4.0.0.zip</downloadurl>
+		</downloads>
+		<tags>
+			<tag>stable</tag>
+		</tags>
+		<maintainer><![CDATA[ Phoca.cz ]]></maintainer>
+		<maintainerurl>https://www.phoca.cz/</maintainerurl>
+		<section>Updates</section>
+		<targetplatform name="joomla" version="4.[0]"/>
 		<client>site</client>
 	</update>
 </updates>

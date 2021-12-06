@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="module" client="site" method="upgrade" version="3.9">
+<extension type="module" client="site" method="upgrade" version="4.0">
 	<name>mod_phocadownload_tree</name>
 	<author>Jan Pavelka (www.phoca.cz)</author>
-	<creationDate>22/10/2020</creationDate>
+	<creationDate>06/12/2021</creationDate>
 	<authorEmail></authorEmail>
 	<authorUrl>https://www.phoca.cz</authorUrl>
 	<copyright>Jan Pavelka</copyright>
 	<license>GNU/GPL</license>
-	<version>3.2.1</version>
+	<version>4.0.0</version>
 	<description>MOD_PHOCADOWNLOAD_TREE_DESCRIPTION</description>
 	<projectName>PhocaDownloadTreeModule</projectName>
 

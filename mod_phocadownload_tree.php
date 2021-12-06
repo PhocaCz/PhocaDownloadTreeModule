@@ -39,7 +39,7 @@ $category_ordering		= $paramsC->get( 'category_ordering', 1 );
 $categoryOrdering 		= PhocaDownloadOrdering::getOrderingText($category_ordering, 2);
 $moduleclass_sfx 			= htmlspecialchars($params->get('moduleclass_sfx'), ENT_COMPAT, 'UTF-8');
 HTMLHelper::_('stylesheet', 'media/mod_phocadownload_tree/jstree/themes/proton/style.min.css', array('version' => 'auto'));
-HTMLHelper::_('script', 'media/mod_phocadownload_tree/jstree/jstree.min.js', array('version' => 'auto'), array('defer' => true));
+HTMLHelper::_('script', 'media/mod_phocadownload_tree/jstree/jstree.min.js', array('version' => 'auto'));
 
 
 $treeId = uniqid( "phdtjstree" );
@@ -182,7 +182,7 @@ if(isset($itemsCategories[0]) && (int)$params->get('display_header', 1) == 1) {
 Joomla\CMS\HTML\HTMLHelper::_('jquery.framework', false);
 $js	  = array();
 $js[] = ' ';
-$js[] = 'jQuery(function () {';
+$js[] = 'jQuery(document).ready(function() {';
 $js[] = '   jQuery("#'.$treeId.'").jstree({';
 $js[] = '      "core": {';
 $js[] = '         "themes": {';
@@ -197,7 +197,7 @@ $js[] = '   jQuery("#'.$treeId.'").on("changed.jstree", function (e, data) {';
 //$js[] = '      con sole.log(data.selected);';
 $js[] = '   });';
 $js[] = '   ';
-$js[] = '   jQuery("button").on("click", function () {';
+$js[] = '   jQuery("#'.$treeId.' button").on("click", function () {';
 $js[] = '      jQuery("#'.$treeId.'").jstree(true).select_node("child_node_1");';
 $js[] = '      jQuery("#'.$treeId.'").jstree("select_node", "child_node_1");';
 $js[] = '      jQuery.jstree.reference("#'.$treeId.'").select_node("child_node_1");';
