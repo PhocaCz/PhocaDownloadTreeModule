@@ -2,7 +2,7 @@
 <extension type="module" client="site" method="upgrade" version="4.0">
 	<name>mod_phocadownload_tree</name>
 	<author>Jan Pavelka (www.phoca.cz)</author>
-	<creationDate>06/12/2021</creationDate>
+	<creationDate>08/12/2021</creationDate>
 	<authorEmail></authorEmail>
 	<authorUrl>https://www.phoca.cz</authorUrl>
 	<copyright>Jan Pavelka</copyright>
@@ -41,9 +41,9 @@
 					<option value="0">MOD_PHOCADOWNLOAD_TREE_NO</option>
 				</field>
 				
-				<field name="moduleclass_sfx" type="text" label="COM_MODULES_FIELD_MODULECLASS_SFX_LABEL" description="COM_MODULES_FIELD_MODULECLASS_SFX_DESC"/>
+				<field name="moduleclass_sfx" type="text" label="COM_MODULES_FIELD_MODULECLASS_SFX_LABEL" description=""/>
 				
-<field name="cache" type="list" default="0" label="COM_MODULES_FIELD_CACHING_LABEL" description="COM_MODULES_FIELD_CACHING_DESC">
+<field name="cache" type="list" default="0" label="COM_MODULES_FIELD_CACHING_LABEL" description="">
 <option value="0">COM_MODULES_FIELD_VALUE_NOCACHING</option>
 </field>
 				
