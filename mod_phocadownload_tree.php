@@ -37,7 +37,7 @@ $document	= JFactory::getDocument();
 $paramsC		= JComponentHelper::getParams('com_phocadownload') ;
 $category_ordering		= $paramsC->get( 'category_ordering', 1 );
 $categoryOrdering 		= PhocaDownloadOrdering::getOrderingText($category_ordering, 2);
-$moduleclass_sfx 			= htmlspecialchars($params->get('moduleclass_sfx'), ENT_COMPAT, 'UTF-8');
+$moduleclass_sfx 			= htmlspecialchars((string)$params->get('moduleclass_sfx'), ENT_COMPAT, 'UTF-8');
 HTMLHelper::_('stylesheet', 'media/mod_phocadownload_tree/jstree/themes/proton/style.min.css', array('version' => 'auto'));
 HTMLHelper::_('script', 'media/mod_phocadownload_tree/jstree/jstree.min.js', array('version' => 'auto'));
 
