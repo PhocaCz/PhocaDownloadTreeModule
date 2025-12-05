@@ -12,10 +12,15 @@
  */
 defined('_JEXEC') or die('Restricted access');// no direct access
 
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Helper\ModuleHelper;
 use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
 
 // Include Phoca Download
-if (!JComponentHelper::isEnabled('com_phocadownload', true)) {
+if (!ComponentHelper::isEnabled('com_phocadownload', true)) {
 	echo '<div class="alert alert-danger">Phoca Download Error: Phoca Download component is not installed or not published on your system</div>';
 	return;
 }
@@ -29,12 +34,12 @@ phocadownloadimport('phocadownload.path.route');
 phocadownloadimport('phocadownload.access.access');
 phocadownloadimport('phocadownload.ordering.ordering');
 
-$user 		= JFactory::getUser();
-$db 		= JFactory::getDBO();
-$app 		= JFactory::getApplication();
+$user 		= Factory::getUser();
+$db 		= Factory::getDBO();
+$app 		= Factory::getApplication();
 $menu 		= $app->getMenu();
-$document	= JFactory::getDocument();
-$paramsC		= JComponentHelper::getParams('com_phocadownload') ;
+$document	= Factory::getDocument();
+$paramsC		= ComponentHelper::getParams('com_phocadownload') ;
 $category_ordering		= $paramsC->get( 'category_ordering', 1 );
 $categoryOrdering 		= PhocaDownloadOrdering::getOrderingText($category_ordering, 2);
 $moduleclass_sfx 			= htmlspecialchars((string)$params->get('moduleclass_sfx'), ENT_COMPAT, 'UTF-8');
@@ -45,9 +50,9 @@ HTMLHelper::_('script', 'media/mod_phocadownload_tree/jstree/jstree.min.js', arr
 $treeId = uniqid( "phdtjstree" );
 
 // Current category info
-$id 	= $app->input->get( 'id', 0, 'int' );
-$option = $app->input->get( 'option', '', 'string' );
-$view 	= $app->input->get( 'view', '', 'string' );
+$id 	= $app->getInput()->get( 'id', 0, 'int' );
+$option = $app->getInput()->get( 'option', '', 'string' );
+$view 	= $app->getInput()->get( 'view', '', 'string' );
 
 if ( $option == 'com_phocadownload' && $view == 'category' ) {
 	$categoryId = $id;
@@ -76,7 +81,7 @@ $display_access_category = $params->get( 'display_access_category',0 );
 
 // ACCESS - Only registered or not registered
 $hideCatAccessSql = '';
-$user  = JFactory::getUser();
+$user  = Factory::getUser();
 $aid = max ($user->getAuthorisedViewLevels());
 if ($display_access_category == 0) {
  $hideCatAccessSql = ' AND cc.access <= '. $aid;
@@ -141,7 +146,7 @@ function PDTMnestedToUl($data, $currentCatid = 0) {
 	if (!empty($data) && count($data) > 0) {
 		$result[] = '<ul>';
 		foreach ($data as $k => $v) {
-			$link 		= JRoute::_(PhocaDownloadRoute::getCategoryRoute($v['id'], $v['alias']));
+			$link 		= Route::_(PhocaDownloadRoute::getCategoryRoute($v['id'], $v['alias']));
 
 			// Current Category is selected
 			if ($currentCatid == $v['id']) {
@@ -173,13 +178,13 @@ $linkCategories 	= '';
 $categoriesHeader 	= '';
 if(isset($itemsCategories[0]) && (int)$params->get('display_header', 1) == 1) {
 	$itemId = $itemsCategories[0]->id;
-	$linkCategories = JRoute::_('index.php?option=com_phocadownload&view=categories&Itemid='.$itemId);
-	$categoriesHeader = '<div><a href="'.$linkCategories.'" style="text-decoration:none;color:#333;">'.JText::_( 'MOD_PHOCADOWNLOAD_TREE_CATEGORIES' ).'</a></div>';
+	$linkCategories = Route::_('index.php?option=com_phocadownload&view=categories&Itemid='.$itemId);
+	$categoriesHeader = '<div><a href="'.$linkCategories.'" style="text-decoration:none;color:#333;">'.Text::_( 'MOD_PHOCADOWNLOAD_TREE_CATEGORIES' ).'</a></div>';
 }
 
 
 
-Joomla\CMS\HTML\HTMLHelper::_('jquery.framework', false);
+HTMLHelper::_('jquery.framework', false);
 $js	  = array();
 $js[] = ' ';
 $js[] = 'jQuery(document).ready(function() {';
@@ -205,6 +210,10 @@ $js[] = '   });';
 $js[] = '});';
 $js[] = ' ';
 
-$document->addScriptDeclaration(implode("\n", $js));
-require(JModuleHelper::getLayoutPath('mod_phocadownload_tree'));
+//$document->addScriptDeclaration(implode("\n", $js));
+$app = Factory::getApplication();
+$wa  = $app->getDocument()->getWebAssetManager();
+$wa->addInlineScript(implode("\n",$js));
+
+require(ModuleHelper::getLayoutPath('mod_phocadownload_tree'));
 ?>
